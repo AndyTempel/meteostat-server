@@ -107,8 +107,8 @@ def point_normals():
 
         except BaseException:
 
-            # Bad request
-            abort(400)
+            # Server error
+            abort(500)
 
     else:
 

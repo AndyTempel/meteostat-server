@@ -178,8 +178,8 @@ def stations_nearby():
 
         except BaseException:
 
-            # Bad request
-            abort(400)
+            # Server error
+            abort(500)
 
     else:
 
