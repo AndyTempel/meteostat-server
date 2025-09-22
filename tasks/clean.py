@@ -4,10 +4,12 @@ Meteostat JSON API Server
 The code is licensed under the MIT license.
 """
 
+import os
 from meteostat import Hourly, Daily, Monthly, Normals
 
-# Change cache directory to Apache user
-cache_dir = '/var/www/.meteostat/cache'
+# Configurable cache directory (default inside container/app)
+cache_dir = os.environ.get('METEOSTAT_CACHE_DIR', '/app/.meteostat/cache')
+os.makedirs(cache_dir, exist_ok=True)
 Hourly.cache_dir = cache_dir
 Daily.cache_dir = cache_dir
 Monthly.cache_dir = cache_dir

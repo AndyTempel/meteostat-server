@@ -1,0 +1,19 @@
+[project]
+name = "meteostat-server"
+version = "0.1.0"
+description = "Meteostat JSON API server (modernized)"
+requires-python = ">=3.10"
+dependencies = [
+    "configparser>=7.2.0",
+    "flask>=3.1.2",
+    "meteostat>=1.7.4",
+    "mysql-connector-python>=9.4.0",
+    "sqlalchemy>=2.0.43",
+    "gunicorn>=22.0.0",
+]
+
+[dependency-groups]
+dev = [
+    "autopep8>=2.3.2",
+    "pylint>=3.3.8",
+]

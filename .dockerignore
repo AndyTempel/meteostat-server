@@ -1,0 +1,39 @@
+# VCS
+.git
+.gitignore
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+.env
+.venv
+venv/
+ENV/
+
+# Editor/IDE
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build caches
+*.egg-info/
+.eggs/
+.pytest_cache/
+.mypy_cache/
+
+# Node/npm (if present)
+node_modules/
+
+# Data & logs
+logs/
+*.log
+
+# uv
+.uv/
+

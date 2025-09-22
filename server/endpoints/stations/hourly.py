@@ -94,9 +94,11 @@ def stations_hourly():
                 # Fetch DataFrame
                 data = data.fetch()
 
-                # Convert to integer
-                data['tsun'] = data['tsun'].astype('Int64')
-                data['coco'] = data['coco'].astype('Int64')
+                # Convert to integer when columns exist
+                if 'tsun' in data.columns:
+                    data['tsun'] = data['tsun'].astype('Int64')
+                if 'coco' in data.columns:
+                    data['coco'] = data['coco'].astype('Int64')
 
                 # DateTime Index to String
                 data.index = data.index.strftime('%Y-%m-%d %H:%M:%S')

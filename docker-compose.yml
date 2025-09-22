@@ -1,0 +1,42 @@
+version: "3.9"
+
+services:
+  db:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: meteostat
+      MYSQL_USER: meteouser
+      MYSQL_PASSWORD: meteoPass123!
+    ports:
+      - "3306:3306"
+    volumes:
+      - dbdata:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u \"$MYSQL_USER\" -p\"$MYSQL_PASSWORD\""]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  api:
+    build: .
+    image: meteostat-server:local
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: "mysql+mysqlconnector://meteouser:meteoPass123!@db:3306/meteostat?charset=utf8"
+      METEOSTAT_SECRET_DISABLE: "1"
+      METEOSTAT_SERVER_NAME: "jasper"
+      PORT: "8000"
+    ports:
+      - "8000:8000"
+    # Uncomment to mount a host config file instead of environment variables
+    # volumes:
+    #   - ${USERPROFILE}/.meteostat-server:/root/.meteostat-server:ro
+
+volumes:
+  dbdata:
+

@@ -145,16 +145,19 @@ def stations_meta():
                 'icao': args['icao']
             })
 
-            if query.rowcount > 0:
+            # Fetch single result
+            row = query.fetchone()
 
-                # Fetch result
-                data = query.fetchone()
+            if row is not None:
 
-                # Create dict of names
+                data = row._mapping
+
+                # Create dict of alternate names
                 try:
                     names = json.loads(data['name_alt'])
                 except BaseException:
                     names = {}
+                # Ensure English name fallback
                 names['en'] = data['name']
 
                 # Create JSON output
@@ -218,6 +221,5 @@ def stations_meta():
             abort(500)
 
     else:
-
         # Bad request
         abort(400)

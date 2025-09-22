@@ -1,70 +1,95 @@
-# Meteostat Server
+# Meteostat Server (modernized)
 
-The Meteostat server allows everyone to run a local instance of the Meteostat [JSON API](https://rapidapi.com/meteostat/api/meteostat/). The server provides different endpoints which return historical weather data and meta information in JSON format.
+The Meteostat server lets you run a local instance of the Meteostat JSON API. It provides endpoints which return historical weather data and meta information in JSON format.
 
-## Installation
+What's new in this fork:
+- Modern dependency management via pyproject.toml and uv
+- Flask 3.x and SQLAlchemy 2.x compatibility
+- Config via environment variables or ~/.meteostat-server/config.ini
+- Health endpoint at /health
+- Production-ready Dockerfile and optional docker-compose.yml
 
-First, make sure you have Git and Python 3 running on your machine.
+## Quick start (local)
 
-Then, clone this repository by running:
+Prerequisites:
+- Python 3.10+
+- uv (https://docs.astral.sh/uv/) or install via pipx: pipx install uv
 
-```sh
-git clone https://github.com/meteostat/meteostat-server
+Install dependencies:
+
+```bat
+uv sync
 ```
 
-Now you can install the package's dependencies:
+Run the dev server:
 
-```sh
-cd meteostat-server
-python3 -m pip install . -U
+```bat
+uv run python app.py
 ```
 
-Before you can start serving JSON data, make sure to place a customized `config.ini` file in the `~/.meteostat-server` directory. You can use `config.example.ini` in the root of this repository as a template.
+By default it listens on 0.0.0.0:8000. Test:
 
-Finally, you can run a local test server using:
-
-```sh
-python3 app.py
+```bat
+curl http://localhost:8000/health
 ```
 
-## Deployment
+### Configuration
 
-When deploying Meteostat Server for production, you should use a robust web server like Apache or nginx. Generally, the process is as straight-forward as deploying any other Flask application.
+You can provide configuration either via a config file or environment variables.
 
-### Apache
+Option A: Config file
+- Create %USERPROFILE%\.meteostat-server\config.ini (on Linux/macOS: ~/.meteostat-server/config.ini)
+- Use config.example.ini as a template
 
-At Meteostat we're using Apache on Ubuntu. The Apache server is running using the `app.wsgi` file provided in this repository.
+Option B: Environment variables (override config file if present)
+- METEOSTAT_SERVER_NAME
+- METEOSTAT_SECRET_NAME, METEOSTAT_SECRET_VALUE, METEOSTAT_SECRET_DISABLE=1 to disable
+- DATABASE_URL (e.g. mysql+mysqlconnector://user:pass@host:3306/db?charset=utf8)
+- Or individual DB vars: METEOSTAT_DB_HOST, METEOSTAT_DB_PORT, METEOSTAT_DB_USER, METEOSTAT_DB_PASSWORD, METEOSTAT_DB_NAME
 
-First, let's install `mod_wsgi`:
+## Docker
 
-```sh
-apt-get install libapache2-mod-wsgi-py3
+Build image:
+
+```bat
+docker build -t meteostat-server .
 ```
 
-Then, add an Apache configuration file using this template:
+Run container (no auth header, DB via env):
 
-```
-ServerName jasper.meteostat.net
-WSGIScriptAlias / /var/www/vhosts/jasper.meteostat.net/meteostat-server/app.wsgi
-```
-
-If you're receiving internal server errors when accessing endpoints, please check if the Apache user has write-access for Meteostat Python's cache directory. You can grant missing rights using `chmod`:
-
-```sh
-sudo chmod -R 777 /var/www/
+```bat
+docker run --rm -p 8000:8000 ^
+  -e METEOSTAT_SECRET_DISABLE=1 ^
+  -e DATABASE_URL="mysql+mysqlconnector://user:pass@host:3306/meteostat?charset=utf8" ^
+  meteostat-server
 ```
 
-Also, after making changes to the Python code or pulling the latest state, you'll probably need to restart Apache for the changes to become effective:
+Test:
 
-```sh
-/etc/init.d/apache2 restart
+```bat
+curl http://localhost:8000/health
 ```
+
+### Docker Compose (with MySQL)
+
+A sample compose file is included. It starts MySQL and the API:
+
+```bat
+docker compose up -d --build
+```
+
+This exposes:
+- API at http://localhost:8000
+- MySQL on port 3306 (credentials in docker-compose.yml)
+
+## Production
+
+For production, prefer running the container image (it uses gunicorn by default). If deploying on your own stack, point a reverse proxy to the container and configure secrets/DB access via environment variables.
 
 ## Data License
 
-Meteorological data is provided under the terms of the [Creative Commons Attribution-NonCommercial 4.0 International Public License (CC BY-NC 4.0)](https://creativecommons.org/licenses/by-nc/4.0/legalcode). You may build upon the material
-for any purpose, even commercially. However, you are not allowed to redistribute Meteostat data "as-is" for commercial purposes.
+Meteorological data is provided under the terms of the Creative Commons Attribution-NonCommercial 4.0 International Public License (CC BY-NC 4.0). You may build upon the material for any purpose, even commercially. However, you are not allowed to redistribute Meteostat data "as-is" for commercial purposes.
 
 ## Code License
 
-The code of the Meteostat project is available under the [MIT license](https://opensource.org/licenses/MIT).
+The code of the Meteostat project is available under the MIT license.

@@ -1,2 +1,5 @@
-5 4 * * * python3 -W ignore ~/meteostat-server/tasks/clean.py
-5 5 * * * sh ~/meteostat-server/tasks/db_import.sh
+# Meteostat server cron jobs (container)
+# Times are in UTC inside the container
+
+5 4 * * * /app/.venv/bin/python -W ignore /app/tasks/clean.py >> /var/log/cron.log 2>&1
+5 5 * * * /bin/sh /app/tasks/db_import.sh >> /var/log/cron.log 2>&1

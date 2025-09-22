@@ -133,16 +133,17 @@ def stations_nearby():
                 'limit': args['limit']
             })
 
-            if query.rowcount > 0:
+            # Fetch results
+            results = query.fetchall()
 
-                # Fetch results
-                results = query.fetchall()
+            if results:
 
                 # Output list
                 output = []
 
                 # Go through stations
-                for data in results:
+                for row in results:
+                    data = row._mapping
 
                     # Create dict of names
                     try:
